@@ -1,0 +1,10 @@
+{
+  "name": "Moss & Lantern: Cozy Crypts",
+  "short_name": "Moss & Lantern",
+  "description": "Cozy 2D top-down fantasy roguelike dungeon crawler built for 16:9 landscape play.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#13171C",
+  "theme_color": "#13171C"
+}

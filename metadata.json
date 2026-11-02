@@ -1,0 +1,6 @@
+{
+  "name": "Moss & Lantern: Cozy Crypts",
+  "description": "A cozy 2D top-down fantasy roguelike dungeon crawler featuring charming undead hero Zed, customizable skill loadouts, fluid 3-phase combat animations, procedural dungeon rooms, and exciting boss battles.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

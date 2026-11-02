@@ -120,6 +120,8 @@ export class GameEngine {
   private touchAttackHeld = false;
   private joyX = 0;
   private joyY = 0;
+  private lastJoystickAngle: number | null = null;
+  private keysDown = new Set<string>();
 
   // MOBA Hold-to-Aim & Release-to-Cast Ground Indicator state
   private skillAimPreview: SkillAimPreview | null = null;
@@ -420,6 +422,9 @@ export class GameEngine {
   public setJoystickVector(dx: number, dy: number): void {
     this.joyX = dx;
     this.joyY = dy;
+    if (Math.hypot(dx, dy) > 0.04) {
+      this.lastJoystickAngle = Math.atan2(dy, dx);
+    }
   }
 
   public setTouchAttackHeld(held: boolean): void {
@@ -579,9 +584,14 @@ export class GameEngine {
       return nearestEnemyAngle;
     }
 
+    // If no enemy is near during skill tapping, automatically target the same direction as the joystick
     const moveVec = this.computeMoveInputVector();
-    if (Math.hypot(moveVec.x, moveVec.y) > 0.08) {
+    if (Math.hypot(moveVec.x, moveVec.y) > 0.04) {
       return Math.atan2(moveVec.y, moveVec.x);
+    }
+
+    if (this.lastJoystickAngle !== null) {
+      return this.lastJoystickAngle;
     }
 
     return this.player.facingAngle;
@@ -595,8 +605,12 @@ export class GameEngine {
     }
 
     const moveVec = this.computeMoveInputVector();
-    if (Math.hypot(moveVec.x, moveVec.y) > 0.08) {
+    if (Math.hypot(moveVec.x, moveVec.y) > 0.04) {
       return Math.atan2(moveVec.y, moveVec.x);
+    }
+
+    if (this.lastJoystickAngle !== null) {
+      return this.lastJoystickAngle;
     }
 
     return this.player.facingAngle;
@@ -849,8 +863,13 @@ export class GameEngine {
     let mx = 0;
     let my = 0;
 
+    if (this.keysDown.has('KeyW') || this.keysDown.has('ArrowUp')) my -= 1;
+    if (this.keysDown.has('KeyS') || this.keysDown.has('ArrowDown')) my += 1;
+    if (this.keysDown.has('KeyA') || this.keysDown.has('ArrowLeft')) mx -= 1;
+    if (this.keysDown.has('KeyD') || this.keysDown.has('ArrowRight')) mx += 1;
+
     // Smooth 360-degree floating virtual joystick vector
-    if (Math.hypot(this.joyX, this.joyY) > 0.08) {
+    if (Math.hypot(this.joyX, this.joyY) > 0.04) {
       mx = this.joyX;
       my = this.joyY;
     }
@@ -1736,11 +1755,42 @@ export class GameEngine {
 
 
 
+  private handleKeyDown = (e: KeyboardEvent): void => {
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+    if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
+      e.preventDefault();
+    }
+    this.keysDown.add(e.code);
+
+    if (e.code === 'Space') {
+      this.triggerBasicAttack();
+    } else if (e.code === 'Digit1' || e.code === 'KeyJ') {
+      this.triggerNormalSkill(0);
+    } else if (e.code === 'Digit2' || e.code === 'KeyK') {
+      this.triggerNormalSkill(1);
+    } else if (e.code === 'Digit3' || e.code === 'KeyL') {
+      this.triggerUltimate();
+    } else if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
+      this.triggerDodge();
+    } else if (e.code === 'KeyF' || e.code === 'KeyE') {
+      this.triggerInteract();
+    }
+  };
+
+  private handleKeyUp = (e: KeyboardEvent): void => {
+    this.keysDown.delete(e.code);
+  };
+
   private bindEvents(): void {
     window.addEventListener('resize', this.resizeCanvas);
+    window.addEventListener('keydown', this.handleKeyDown);
+    window.addEventListener('keyup', this.handleKeyUp);
   }
 
   private unbindEvents(): void {
     window.removeEventListener('resize', this.resizeCanvas);
+    window.removeEventListener('keydown', this.handleKeyDown);
+    window.removeEventListener('keyup', this.handleKeyUp);
   }
 }

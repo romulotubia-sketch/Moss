@@ -224,7 +224,15 @@ export function GameHUD({
         {/* Top-Left: Compact MOBA Hero Status Strip */}
         <div className="pointer-events-auto bg-[#141920]/88 backdrop-blur-sm border border-white/12 rounded-2xl px-3 py-2 flex items-center gap-3 shadow-lg">
           {/* Level Crest */}
-          <div className="w-9 h-9 rounded-full bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center font-mono text-xs font-bold text-emerald-300 shrink-0 tabular-nums">
+          <div
+            className={`w-9 h-9 rounded-full ${
+              hero.id === 'skeleton'
+                ? 'bg-sky-500/20 border-sky-400/50 text-sky-300'
+                : hero.id === 'goblin'
+                ? 'bg-amber-500/20 border-amber-400/50 text-amber-300'
+                : 'bg-emerald-500/20 border-emerald-400/50 text-emerald-300'
+            } border flex items-center justify-center font-mono text-xs font-bold shrink-0 tabular-nums`}
+          >
             {snapshot.level}
           </div>
 
@@ -600,16 +608,24 @@ export function GameHUD({
               attackPressed
                 ? hero.id === 'skeleton'
                   ? 'scale-91 bg-sky-400 border-white text-slate-950 shadow-[0_0_28px_rgba(56,189,248,0.65)]'
+                  : hero.id === 'goblin'
+                  ? 'scale-91 bg-amber-400 border-white text-slate-950 shadow-[0_0_28px_rgba(250,204,21,0.65)]'
                   : 'scale-91 bg-emerald-400 border-white text-slate-950 shadow-[0_0_28px_rgba(52,211,153,0.65)]'
                 : hero.id === 'skeleton'
                 ? 'scale-100 bg-gradient-to-br from-[#1C2C3B] to-[#131D28] border-sky-400/80 text-sky-100 shadow-[0_6px_24px_rgba(0,0,0,0.6)]'
+                : hero.id === 'goblin'
+                ? 'scale-100 bg-gradient-to-br from-[#332A15] to-[#1F180A] border-amber-400/80 text-amber-200 shadow-[0_6px_24px_rgba(0,0,0,0.6)]'
                 : 'scale-100 bg-gradient-to-br from-[#1F3332] to-[#152026] border-emerald-400/80 text-emerald-200 shadow-[0_6px_24px_rgba(0,0,0,0.6)]'
             }`}
           >
             {/* Inner decorative cozy runic ring */}
             <span
               className={`pointer-events-none absolute inset-1.5 rounded-full border ${
-                hero.id === 'skeleton' ? 'border-sky-300/30' : 'border-emerald-300/30'
+                hero.id === 'skeleton'
+                  ? 'border-sky-300/30'
+                  : hero.id === 'goblin'
+                  ? 'border-amber-300/30'
+                  : 'border-emerald-300/30'
               }`}
             />
             <AbilityIcon iconKey={basicAttackDef.iconKey} className="w-10 h-10" />
